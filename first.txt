@@ -1,4 +1,0 @@
-Hi everyone
-we are learning java
-using vs code
-I like programming in java
