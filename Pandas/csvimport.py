@@ -2,9 +2,9 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt  # for plot() function,line 52
 
-df = pd.read_csv('/Users/nirdeshbalar/Downloads/matches.csv')   # path of .csv file for import file 
+df = pd.read_csv('matches.csv')   # path of .csv file for import file 
 
-delivery = pd.read_csv('/Users/nirdeshbalar/Downloads/deliveries.csv')
+delivery = pd.read_csv('deliveries.csv')
 # print(df.head())  # top 5 row show
 
 # print(df.tail())   # last 5 row show
