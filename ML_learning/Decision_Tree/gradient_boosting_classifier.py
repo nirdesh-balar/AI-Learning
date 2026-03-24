@@ -1,0 +1,30 @@
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+from sklearn.datasets import make_classification
+from sklearn.ensemble import GradientBoostingClassifier
+
+
+X, y = make_classification(
+    n_samples=500,
+    n_features=20,
+    n_informative=10,
+    random_state=42
+)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42
+)
+
+gbc = GradientBoostingClassifier(
+    learning_rate=0.1, 
+    n_estimators=150,
+    max_depth=3,
+    random_state=42
+)
+
+gbc.fit(X_train, y_train)
+
+
+y_pred = gbc.predict(X_test)
+
+print("accuracy: ", accuracy_score(y_test, y_pred))

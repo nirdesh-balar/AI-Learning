@@ -1,0 +1,59 @@
+from sklearn.svm import SVC
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn import datasets
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import accuracy_score, classification_report
+
+
+df = datasets.load_iris(as_frame=True).frame
+
+X = df.drop("target",axis = 1)
+y = df["target"]
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42, stratify=y
+)
+
+
+
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+svc = SVC()
+svc.fit(X_train_scaled, y_train)
+y_pred = svc.predict(X_test_scaled)
+
+
+print("accuracy: ", accuracy_score(y_test, y_pred))
+print("classification report: \n ", classification_report(y_test, y_pred))
+
+# Polynomial kernel
+
+svc = SVC(kernel="poly")
+svc.fit(X_train_scaled, y_train)
+
+y_pred = svc.predict(X_test_scaled)
+
+print("accuracy: ", accuracy_score(y_test, y_pred))
+
+# Sigmoid kernel
+
+svc = SVC(kernel="sigmoid")
+svc.fit(X_train_scaled, y_train)
+
+y_pred = svc.predict(X_test_scaled)
+
+print("accuracy: ", accuracy_score(y_test, y_pred))
+
+# C_vals = [0.5, 1, 2, 3, 4, 5]
+
+# for c_val in C_vals:
+
+#     svc = SVC(C=c_val, kernel="rbf")
+#     svc.fit(X_train_scaled, y_train)
+
+#     y_pred = svc.predict(X_test_scaled)
+
+#     print("C = ", c_val, "& accuracy: ", accuracy_score(y_test, y_pred))
