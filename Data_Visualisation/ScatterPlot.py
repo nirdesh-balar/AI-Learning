@@ -19,4 +19,4 @@ for i in range(len(people)):
 plt.xlim(min(age),max(age)+10)
 plt.ylim(min(blood_pressure)-5,max(blood_pressure)+5)
 
-plt.show( )
+plt.show()
