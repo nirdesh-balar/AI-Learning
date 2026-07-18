@@ -1,0 +1,128 @@
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+import torch
+import torch.nn as nn
+from torch.utils.data import TensorDataset,DataLoader
+import torch.optim as optim
+from sklearn.metrics import r2_score
+
+df = pd.read_csv("powerplant_data.csv")
+
+# print(df.isnull().sum())
+
+X = df.drop("PE",axis = 1)
+y = df["PE"]
+
+X_train,X_test,y_train,y_test = train_test_split(
+    X,y,random_state=42,test_size=0.2
+)
+
+scaled = StandardScaler()
+X_train_scaled = scaled.fit_transform(X_train)
+X_test_scaled = scaled.transform(X_test)
+
+X_train_tensor = torch.tensor(X_train_scaled , dtype=torch.float32)
+y_train_tensor = torch.tensor(y_train.values , dtype=torch.float32).view(-1,1)
+X_test_tensor = torch.tensor(X_test_scaled , dtype=torch.float32)
+y_test_tensor = torch.tensor(y_test.values , dtype=torch.float32).view(-1,1)
+
+train_dataset = TensorDataset(X_train_tensor,y_train_tensor)
+test_dataset = TensorDataset(X_test_tensor,y_test_tensor)
+
+train_loader = DataLoader(train_dataset , batch_size=32 , shuffle=True)
+test_loader = DataLoader(test_dataset , batch_size=32)
+
+# Define our ANN Model
+
+class ANN(nn.Module):
+    def __init__(self):
+        super(ANN, self).__init__()
+
+        self.model = nn.Sequential(
+            # 1st hidden layer
+            nn.Linear(X_train.shape[1], 6),
+            nn.ReLU(),
+    
+            # 2nd hidden layer
+            nn.Linear(6, 6),
+            nn.ReLU(),
+    
+            # output layer
+            nn.Linear(6, 1),
+        )
+
+    def forward(self, x):
+        return self.model(x)
+    
+model = ANN()
+
+# loss, optimizer
+crietrion = nn.MSELoss()
+optimizer = optim.Adam(model.parameters())
+
+# Train ANN
+train_losses = []
+val_losses = []
+
+best_val_loss = float("inf")
+
+epochs = 100
+
+for epoch in range(epochs):
+    model.train()
+    running_loss = 0.0 # tot training loss for 1 epoch
+    
+    for xb, yb in train_loader:
+        # xb = features of 1 batch
+        # yb = labels of 1 batch
+        optimizer.zero_grad()
+        
+        outputs = model(xb) # forward prop....predicted outputs for this batch
+        loss = crietrion(outputs, yb) # compute loss
+        loss.backward() # back prop.. compute gradients
+        optimizer.step() # params update
+        
+        running_loss += loss.item() # loss is a tensor => py float
+
+    epoch_train_loss = running_loss / len(train_loader)
+    train_losses.append(epoch_train_loss)
+
+
+    # Validation
+    model.eval()
+    running_val_loss = 0.0
+
+    with torch.no_grad(): # no gradients compute
+        for xb, yb in test_loader:
+            outputs = model(xb)
+            loss = crietrion(outputs, yb)
+            running_val_loss += loss
+
+    epoch_val_loss = running_val_loss / len(test_loader)
+    val_losses.append(epoch_val_loss)
+
+    print(f"epoch {epoch+1}/{epochs} ==> train loss = {epoch_train_loss} & val loss = {epoch_val_loss}")
+
+    if epoch_val_loss < best_val_loss:
+        best_val_loss = epoch_val_loss
+        torch.save(model.state_dict(), "best_model.pt") #.pt or .pth
+
+# Loading the best model
+model.load_state_dict(torch.load("best_model.pt"))
+
+# Evaluation
+
+model.eval()
+with torch.no_grad():
+    train_preds = model(X_train_tensor)
+    test_preds = model(X_test_tensor)
+
+    train_mse_loss = crietrion(train_preds, y_train_tensor)
+    test_mse_loss = crietrion(test_preds, y_test_tensor)
+
+print("Training MSE:", train_mse_loss.item())
+print("Testing MSE:", test_mse_loss.item())
+
+print("r^2 score =", r2_score(y_test, test_preds))

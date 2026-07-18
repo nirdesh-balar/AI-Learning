@@ -22,7 +22,7 @@ y = heart_df["target"]
 # X_train_scaled = scaler.fit_transform(X_train)
 # X_test_scaled = scaler.transform(X_test)
 
-# Knn = KNeighborsClassifier(n_neighbors=7)   # neighbors value is anythingth but you have to odd value because of we have to choess b/w 2 which one is majer so...
+# Knn = KNeighborsClassifier(n_neighbors=7)   # neighbors value is anythingth but you have to choose odd value because of we have to choess b/w 2 which one is majer so...
 # Knn.fit(X_train_scaled , y_train)
 
 # y_pred = Knn.predict(X_test_scaled)
