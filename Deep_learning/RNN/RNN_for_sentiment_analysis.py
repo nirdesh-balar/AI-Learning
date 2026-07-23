@@ -109,7 +109,7 @@ y = df["sentiment"]
 
 # 8 - Vectorization
 
-tf = TfidfVectorizer(max_features=10000)
+tf = TfidfVectorizer(max_features=5000)
 
 X = tf.fit_transform(df["review"])
 
