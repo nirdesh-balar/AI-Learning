@@ -202,47 +202,13 @@ rag_retriever = RAGRetriever(embedding_manager, vector_store)
 
 # OpenAI - GPT
 
-# API_KEY_OPENAI = "paste-your-api-key-here"
+API_KEY_OPENAI = "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"
 
-# from langchain_openai import ChatOpenAI
+from langchain_openai import ChatOpenAI
 
-# llm = ChatOpenAI(
-#     openai_api_key=API_KEY_OPENAI,
-#     model="gpt-5.4",
-#     temperature=0.1,
-#     max_tokens=1024
-# )
-
-# # generate our retrieval-augmented output
-# def generate_output(query, retriever, llm, top_k=3):
-#     results = retriever.retrieve(query, top_k)
-
-#     context = "\n".join([doc["document"] for doc in results]) if results else ""
-
-#     if not context:
-#         print("we found no relevant context for the given query")
-
-#     # context + query
-#     prompt = f""" use given context to generate the answer for the query
-#                 Context: {context}
-#                 Query: {query} """
-
-#     response = llm.invoke(prompt) # expecting a string as prompt
-#     return response.content
-
-# answer = generate_output("what is encoder-decoder?", rag_retriever, llm)
-
-# print(answer)
-
-# Groq
-
-API_Key_GROQ = "paste-your-api-key-here"
-
-from langchain_groq import ChatGroq
-
-llm = ChatGroq(
-    groq_api_key=API_Key_GROQ,
-    model="llama-3.3-70b-versatile",
+llm = ChatOpenAI(
+    openai_api_key=API_KEY_OPENAI,
+    model="gpt-5.4",
     temperature=0.1,
     max_tokens=1024
 )
@@ -261,10 +227,44 @@ def generate_output(query, retriever, llm, top_k=3):
                 Context: {context}
                 Query: {query} """
 
-    response = llm.invoke([prompt.format(context=context, query=query)]) # expecting a list as prompt
+    response = llm.invoke(prompt) # expecting a string as prompt
     return response.content
 
-answer = generate_output("what is RAG?", rag_retriever, llm)
+answer = generate_output("what is encoder-decoder?", rag_retriever, llm)
 
 print(answer)
+
+# Groq
+
+# API_Key_GROQ = "paste-your-api-key-here"
+
+# from langchain_groq import ChatGroq
+
+# llm = ChatGroq(
+#     groq_api_key=API_Key_GROQ,
+#     model="llama-3.3-70b-versatile",
+#     temperature=0.1,
+#     max_tokens=1024
+# )
+
+# # generate our retrieval-augmented output
+# def generate_output(query, retriever, llm, top_k=3):
+#     results = retriever.retrieve(query, top_k)
+
+#     context = "\n".join([doc["document"] for doc in results]) if results else ""
+
+#     if not context:
+#         print("we found no relevant context for the given query")
+
+#     # context + query
+#     prompt = f""" use given context to generate the answer for the query
+#                 Context: {context}
+#                 Query: {query} """
+
+#     response = llm.invoke([prompt.format(context=context, query=query)]) # expecting a list as prompt
+#     return response.content
+
+# answer = generate_output("what is RAG?", rag_retriever, llm)
+
+# print(answer)
 
